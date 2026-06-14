@@ -25,6 +25,10 @@ docs-inbox/
 docs-batches/
 notes/
 
+# Schema-файлы (локально)
+schema.json
+*schema*
+
 # Python
 __pycache__/
 *.py[cod]
