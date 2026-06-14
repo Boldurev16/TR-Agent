@@ -18,10 +18,12 @@ id_rsa
 id_rsa.*
 *.secret
 
-# Кэш, логи и большие рабочие данные
+# Кэш, логи, документы и заметки (локальные рабочие данные)
 cache/
 logs/
+docs-inbox/
 docs-batches/
+notes/
 
 # Python
 __pycache__/
