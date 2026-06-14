@@ -1,6 +1,6 @@
 # TR Agent
 
-Локальная система исследования документов и бизнес-данных: файловый конвейер PDF/Excel + RAG через **AnythingLLM** и локальные LLM (**Ollama** / **LM Studio**).
+Локальная система исследования документов и бизнес-данных: файловый конвейер PDF/Excel + RAG на **LangChain Core** и локальные LLM (**Ollama** / **LM Studio**).
 
 **Документация:** [docs/PRD.md](docs/PRD.md)
 
@@ -11,17 +11,17 @@
 ```mermaid
 flowchart TB
     subgraph USER["Пользователь"]
-        UI["AnythingLLM Web UI :3001"]
+        UI["LangChain Core UI"]
     end
 
     subgraph HOST["Windows Host"]
-        LM["LM Studio :1234/v1<br/>или Ollama :11434"]
+        LM["LM Studio / Ollama<br/>LLM Provider"]
         SCRIPTS["Python / PowerShell<br/>scripts/"]
     end
 
     subgraph DOCKER["Docker"]
-        ALLM["AnythingLLM<br/>RAG + Agent Framework"]
-        VDB[("Vector DB<br/>эмбеддинги")]
+        RUNTIME["LangChain Core Agent Runtime<br/>RAG Pipeline + Orchestrator"]
+        VDB[("LangChain Core<br/>Vector Store")]
     end
 
     subgraph DATA["Файловый слой (локально)"]
@@ -38,10 +38,10 @@ flowchart TB
         YAML["agents reference.yaml"]
     end
 
-    UI --> ALLM
-    ALLM -->|"host.docker.internal"| LM
-    ALLM --> VDB
-    ALLM -->|"Upload документов"| BATCHES
+    UI --> RUNTIME
+    RUNTIME -->|"LLM API"| LM
+    RUNTIME --> VDB
+    RUNTIME -->|"Document Loader"| BATCHES
 
     SCRIPTS --> INBOX
     SCRIPTS --> BATCHES
@@ -53,9 +53,9 @@ flowchart TB
     INBOX -->|"split_radar_by_quadrant.py"| KB
     INBOX -->|"extract_pdf_to_cache.py"| CACHE
 
-    ENV -.-> ALLM
+    ENV -.-> RUNTIME
     MF -.-> LM
-    YAML -.-> ALLM
+    YAML -.-> RUNTIME
 ```
 
 ### Конвейеры данных
@@ -65,7 +65,7 @@ flowchart LR
     subgraph PDF["PDF"]
         P1["docs-inbox/"] --> P2["make_pdf_batches.py"]
         P2 --> P3["docs-batches/"]
-        P3 --> P4["AnythingLLM RAG"]
+        P3 --> P4["LangChain Core RAG Pipeline"]
         P1 --> P5["extract_pdf_to_cache.py"]
         P5 --> P6["cache/"]
     end
@@ -73,7 +73,7 @@ flowchart LR
     subgraph Excel["Excel — база знаний"]
         E1["docs-inbox/*.xlsx"] --> E2["split_radar_by_quadrant.py"]
         E2 --> E3["excel-batches/"]
-        E3 --> E4["RAG / анализ"]
+        E3 --> E4["Retriever / анализ"]
     end
 ```
 
