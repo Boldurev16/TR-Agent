@@ -1,6 +1,32 @@
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $ProjectRoot
 
+# Заглушки endpoint — задайте реальные URL локально или в config/ (не коммитить секреты).
+$Endpoints = @{
+    LangChainCoreRuntime = "<LANGCHAIN_CORE_RUNTIME_URL>"
+    OllamaApi            = "<OLLAMA_API_URL>"
+    LlmProviderApi       = "<LLM_PROVIDER_API_URL>"
+}
+
+function Write-EndpointCheck {
+    param(
+        [string]$Name,
+        [string]$Url
+    )
+
+    if ($Url -match '^<.+>$') {
+        Write-Host "SKIP: $Name — endpoint not configured (stub: $Url)"
+        return
+    }
+
+    try {
+        $null = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 5
+        Write-Host "OK: $Name is available"
+    } catch {
+        Write-Host "ERROR: $Name is not available"
+    }
+}
+
 Write-Host "TR Agent environment check"
 Write-Host "Project folder:"
 Write-Host $ProjectRoot
@@ -21,13 +47,8 @@ if ($ollamaCommand) {
 
 Write-Host ""
 Write-Host "Checking Ollama API..."
+Write-EndpointCheck -Name "Ollama API" -Url $Endpoints.OllamaApi
 
-try {
-    $response = Invoke-WebRequest -Uri "http://127.0.0.1:11434/api/tags" -UseBasicParsing -TimeoutSec 5
-    Write-Host "OK: Ollama API is available"
-} catch {
-    Write-Host "ERROR: Ollama API is not available"
-}
 Write-Host ""
 Write-Host "Checking Docker..."
 
@@ -46,36 +67,38 @@ if ($dockerCommand) {
 } else {
     Write-Host "ERROR: Docker command not found"
 }
-Write-Host ""
-Write-Host "Checking AnythingLLM..."
 
-try {
-    $anythingResponse = Invoke-WebRequest -Uri "http://localhost:3001" -UseBasicParsing -TimeoutSec 5
-    Write-Host "OK: AnythingLLM is available at http://localhost:3001"
-} catch {
-    Write-Host "ERROR: AnythingLLM is not available at http://localhost:3001"
-}
 Write-Host ""
-Write-Host "Checking LM Studio (OpenAI-compatible API on port 1234)..."
+Write-Host "Checking LangChain Core Agent Runtime..."
+Write-EndpointCheck -Name "LangChain Core Agent Runtime" -Url $Endpoints.LangChainCoreRuntime
 
+Write-Host ""
+Write-Host "Checking LLM Provider (OpenAI-compatible API)..."
 try {
-    $lmModels = Invoke-RestMethod -Uri "http://127.0.0.1:1234/v1/models" -TimeoutSec 5 -Method Get
-    Write-Host "OK: LM Studio API is available at http://127.0.0.1:1234/v1"
-    if ($lmModels.data) {
-        Write-Host "Models exposed by the server (id -> use in AnythingLLM):"
-        foreach ($m in $lmModels.data) {
-            Write-Host "  - $($m.id)"
-        }
+    if ($Endpoints.LlmProviderApi -match '^<.+>$') {
+        Write-Host "SKIP: LLM Provider — endpoint not configured (stub: $($Endpoints.LlmProviderApi))"
     } else {
-        Write-Host "(No model list in response; server still answered.)"
+        $modelsUrl = $Endpoints.LlmProviderApi.TrimEnd('/') + "/models"
+        $lmModels = Invoke-RestMethod -Uri $modelsUrl -TimeoutSec 5 -Method Get
+        Write-Host "OK: LLM Provider API is available"
+        if ($lmModels.data) {
+            Write-Host "Models exposed by the server (id -> use in LangChain Core UI):"
+            foreach ($m in $lmModels.data) {
+                Write-Host "  - $($m.id)"
+            }
+        } else {
+            Write-Host "(No model list in response; server still answered.)"
+        }
     }
 } catch {
-    Write-Host "SKIP: LM Studio API not on http://127.0.0.1:1234/v1 (start app, load a model, enable Local Server)"
+    Write-Host "ERROR: LLM Provider API is not available"
 }
+
 Write-Host ""
-Write-Host "Docker -> host LLM (AnythingLLM in a container):"
-Write-Host "  Base URL example: http://host.docker.internal:1234/v1"
-Write-Host "  (localhost inside the container is NOT your Windows host.)"
+Write-Host "LangChain Core Runtime -> LLM Provider:"
+Write-Host "  Configure Base URL stub: $($Endpoints.LlmProviderApi)"
+Write-Host "  (Runtime in Docker must reach the host LLM Provider, not container loopback.)"
+
 Write-Host ""
 Write-Host "Checking system resources..."
 
@@ -99,6 +122,7 @@ Get-PSDrive -PSProvider FileSystem | Select-Object Name, Root, @{
 Write-Host ""
 Write-Host "GPU:"
 Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion | Format-Table -AutoSize
+
 Write-Host ""
 Write-Host "Checking project folders..."
 
