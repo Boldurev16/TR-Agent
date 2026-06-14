@@ -1,0 +1,37 @@
+# Локальная конфигурация (Modelfile, пресеты LLM, эталоны агентов)
+config/
+
+# Секреты и переменные окружения
+.env
+.env.*
+*.env
+!.env.example
+secrets/
+**/secrets/**
+credentials.json
+credentials.*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.*
+*.secret
+
+# Кэш, логи и большие рабочие данные
+cache/
+logs/
+docs-batches/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/

@@ -1,0 +1,487 @@
+{
+  "schema_name": "it_idea_normalization_schema",
+  "schema_version": "1.0.0",
+  "source_file": "Edinaia-model-dannykh-IT-idei-Shema.xlsx",
+  "source_sheet": "Общая модель",
+  "description": "Schema.json для нормализации данных карточек ИТ-идей / прототипов с использованием LLM (Gemma 4, Cursor и др.).",
+  "normalization_rules": [
+    "Сохранять исходные значения полей без потери смысла.",
+    "Даты приводить к формату YYYY-MM-DD, если точная дата присутствует.",
+    "Поля с Да/Нет нормализовать в boolean true/false, сохраняя raw_value при неоднозначности.",
+    "Поля-справочники не придумывать; использовать значение источника как raw_value и canonical_value при наличии словаря.",
+    "Пустые или отсутствующие значения записывать как null."
+  ],
+  "entities": [
+    {
+      "name": "idea",
+      "title": "IT Idea / Prototype Card",
+      "description": "Нормализованная логическая модель карточки ИТ-идеи / прототипа на основе листа «Общая модель».",
+      "primary_key": "ea_tool_code",
+      "fields": [
+        {
+          "name": "kod_ea_tool",
+          "title_ru": "Код EA Tool",
+          "source_mapping": "Absolute Identifier",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "naimenovanie_prototipa_it_resheniya_iz_kartochki_prototipa_it_intsiativy",
+          "title_ru": "Наименование прототипа ИТ-решения (из карточки прототипа/ИТ-инциативы)",
+          "source_mapping": "IdeaName = Item(Generic Local name),In(BasicGroup),Name(\"Idea Name\")",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "predposylki_dlya_prototipirovaniya_tema_issledovaniya_opisanie_potrebnosti_i_biznes_gipotezy",
+          "title_ru": "Предпосылки для прототипирования (тема исследования, описание потребности и бизнес гипотезы)",
+          "source_mapping": "Prerequisites = Item(Prerequisites),In(BasicGroup),Control(Text),Name(\"Prerequisites <Background>\")",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "stadiya_vyberite_iz_vypadayuschego_spiska",
+          "title_ru": "Стадия (выберите из выпадающего списка)",
+          "source_mapping": "IdeaStage = Item(Idea Stage),In(BasicGroup)",
+          "type": "string",
+          "required": false,
+          "enum_hint": "dictionary"
+        },
+        {
+          "name": "opisanie_funktsionalnosti",
+          "title_ru": "Описание функциональности",
+          "source_mapping": "IdeaExpectedValue = Item(Comment),In(NameGroup),Control(Text),Name(\"Description\")",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "opisanie_effekta_ot_avtomatizatsii",
+          "title_ru": "Описание эффекта от автоматизации",
+          "source_mapping": "IdeaExpectedEffect = Item(Expected Business Result),In(NameGroup),Control(Text),Name(\"Expected Business Result\")",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "data_soglasovaniya_kartochki_prototipa",
+          "title_ru": "Дата согласования карточки прототипа",
+          "source_mapping": "IdeaSubmissionDate = Item(Idea Submission Date),In(BasicGroup)",
+          "type": "date",
+          "format": "YYYY-MM-DD",
+          "required": false
+        },
+        {
+          "name": "data_nachala_rabot_po_protipirovaniyu",
+          "title_ru": "Дата начала работ по протипированию",
+          "source_mapping": "IdeaStartDate = Item(Idea Start Date),In(BasicGroup),Name(\"Start Date\")",
+          "type": "date",
+          "format": "YYYY-MM-DD",
+          "required": false
+        },
+        {
+          "name": "planovaya_data_zaversheniya_rabot_po_prototipirovaniyu_i_data_otcheta_ob_eksperimente_s_otsenkoy_effekta",
+          "title_ru": "Плановая дата завершения работ по прототипированию и дата отчета об эксперименте с оценкой эффекта",
+          "source_mapping": "IdeaEndDate = Item(Idea End Date),In(BasicGroup),Name(\"End Date\")",
+          "type": "date",
+          "format": "YYYY-MM-DD",
+          "required": false
+        },
+        {
+          "name": "naimenovanie_i_kod_kastomnoy_tekhnologii_zaregistrirovannoy_v_ea_tool_esli_koda_net_to_vpisat_nazvanie_buduschego_it_resheniya",
+          "title_ru": "Наименование и код кастомной технологии, зарегистрированной в EA Tool (если кода нет, то вписать название будущего ИТ-решения)",
+          "source_mapping": "IdeaSubject = Item(Owned Idea Subject),Contains(IdeaSubjectMap),In(IdeaSubjectGroup),Control(ListView),Title(No),Param(NoDefaultColumn,ReOrder,ToolBar[-LD])",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "naimenovanie_tekhnologiy_i_komponentov_zadeystvovannykh_v_ramkakh_rabot_po_prototipirovaniyu_platforma_ili_inaya_is",
+          "title_ru": "Наименование технологий и компонентов, задействованных в рамках работ по прототипированию (платформа или иная ИС)",
+          "source_mapping": "IdeaSubject = Item(Owned Idea Subject),Contains(IdeaSubjectMap),In(IdeaSubjectGroup),Control(ListView),Title(No),Param(NoDefaultColumn,ReOrder,ToolBar[-LD])",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "servisnaya_liniya_razrabotki_i_podderzhki",
+          "title_ru": "Сервисная линия разработки и поддержки",
+          "source_mapping": "SeviceLineGroup = Group(Bar),Name(\"Serviceline\"),Initially(FalseCondition)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "nomer_zni_esli_primenimo",
+          "title_ru": "Номер ЗНИ (если применимо)",
+          "source_mapping": "InspiredZNI=Item(Inspired ZNI),In(IdeaGeneratedProjectsGroup),Name(\"Исходящий ЗНИ\")",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "nomer_svyazannogo_proekta_ili_nazvanie_it_p_esli_primenimo",
+          "title_ru": "Номер связанного проекта или название (IT.P если применимо)",
+          "source_mapping": "IdeaGeneratedProjectsGroup = Group(Bar),Name(Inspired Projects),Initially(FalseCondition)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "podrazdelenie",
+          "title_ru": "Подразделение",
+          "source_mapping": "SeviceLineGroup = Group(Bar),Name(\"Serviceline\"),Initially(FalseCondition)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "divizion",
+          "title_ru": "Дивизион",
+          "source_mapping": "SeviceLineGroup = Group(Bar),Name(\"Serviceline\"),Initially(FalseCondition)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "roks",
+          "title_ru": "РОКС",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "byudzhet_prototipa",
+          "title_ru": "Бюджет прототипа",
+          "source_mapping": "CostAndEffectsGroup = Group(Bar),Name(\"Cost and effects\"),Initially(FalseCondition)",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "biznes_effekt_ot_vnedreniya_realizuemoy_tekhnologii",
+          "title_ru": "Бизнес эффект от внедрения реализуемой технологии",
+          "source_mapping": "BusinessEffect = Item(NN_BusinessEffect),In(CostAndEffectsGroup),Control(Text),Name(\"Business effect\")",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "tekhnologicheskoe_napravlenie_vybrat_iz_spiska",
+          "title_ru": "Технологическое направление (выбрать из списка)",
+          "source_mapping": "TechnologyClassGroup = Group(Bar),Name(\"Технологические направления\"),Initially(FalseCondition)",
+          "type": "string",
+          "required": false,
+          "enum_hint": "dictionary"
+        },
+        {
+          "name": "riski_prototipirovaniya",
+          "title_ru": "Риски прототипирования",
+          "source_mapping": "RiskItems = Item(Risk),Contains(RiskMap),In(PrioritizationGroup),Control(ListView),Title(Up),Param(NoDefaultColumn,ReOrder)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "sootvetstvie_strategicheskim_tselyam_kompanii",
+          "title_ru": "Соответствие стратегическим целям компании",
+          "source_mapping": "EnterpriseObjective = Item(Enterprise Objective),Contains(EnterpriseObjectiveMap),In(PrioritizationGroup),Control(ListView),Title(Up),Param(NoDefaultColumn,ReOrder)",
+          "type": "boolean",
+          "required": false,
+          "enum_hint": [
+            "Да",
+            "Нет"
+          ]
+        },
+        {
+          "name": "kommercheskiy_nekommercheskiy_effekt",
+          "title_ru": "Коммерческий/некоммерческий эффект",
+          "source_mapping": "CommercialEffect = Item(NN_Commercial Effect),In(PrioritizationGroup),Name(\"Commercial Effect\")",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "rukovoditel_proekta_lider_komandy",
+          "title_ru": "Руководитель проекта/лидер команды",
+          "source_mapping": "Person (System)",
+          "type": "string",
+          "required": false,
+          "relation_hint": "person_reference"
+        },
+        {
+          "name": "e_mail_rukovoditel_proekta_lider_komandy",
+          "title_ru": "E-mail/Руководитель проекта/лидер команды",
+          "source_mapping": "E-mail",
+          "type": "string",
+          "format": "email",
+          "required": false,
+          "relation_hint": "person_reference"
+        },
+        {
+          "name": "ispolzovanie_data_platform_ad_s",
+          "title_ru": "Использование Data Platform\n(AD.S)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ispolzovanie_data_platform_ad_b",
+          "title_ru": "Использование Data Platform\n(AD.B)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ispolzovanie_data_platform_ad_h",
+          "title_ru": "Использование Data Platform\n(AD.H)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ispolzovanie_data_platform_ch",
+          "title_ru": "Использование Data Platform\n(CH)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ispolzovanie_data_platform_dbt",
+          "title_ru": "Использование Data Platform\n(DBT)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ispolzovanie_data_platform_prochee_ukazat",
+          "title_ru": "Использование Data Platform\n(Прочее, указать)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "funktsii_i_reshaemye_zadachi_v_data_platform",
+          "title_ru": "Функции и решаемые задачи в Data Platform",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ispolzovanie_ml_platformy_iml_platformy_da_net",
+          "title_ru": "Использование ML-платформы / IML-платформы\n(Да/Нет)",
+          "type": "boolean",
+          "required": false,
+          "enum_hint": [
+            "Да",
+            "Нет"
+          ]
+        },
+        {
+          "name": "funktsii_i_reshaemye_zadachi_v_ml_platform",
+          "title_ru": "Функции и решаемые задачи в ML Platform",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "tekuschaya_arkhitektura_komponentnaya_baza",
+          "title_ru": "Текущая архитектура (компонентная база)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "tselevaya_arkhitektura_komponentnaya_baza",
+          "title_ru": "Целевая архитектура (компонентная база)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "sootvetstvie_tekuschey_arkhitektury_i_tselevoy_da_net",
+          "title_ru": "Соответствие текущей архитектуры и целевой\n(Да/Нет)",
+          "type": "boolean",
+          "required": false,
+          "enum_hint": [
+            "Да",
+            "Нет"
+          ]
+        },
+        {
+          "name": "trebuetsya_privedenie_k_tselevoy_arkhitekture_da_net",
+          "title_ru": "Требуется приведение к целевой архитектуре?\n(Да/Нет)",
+          "type": "boolean",
+          "required": false,
+          "enum_hint": [
+            "Да",
+            "Нет"
+          ]
+        },
+        {
+          "name": "biznes_postanovka",
+          "title_ru": "Бизнес-постановка",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ftt",
+          "title_ru": "ФТТ",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "arkhitekturnoe_zaklyuchenie",
+          "title_ru": "Архитектурное заключение",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "kartochka_prototipa_ili_proekta_zni",
+          "title_ru": "Карточка прототипа или проекта, ЗНИ",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "protokol_perekhoda_v_pe",
+          "title_ru": "Протокол перехода в ПЭ",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "rezultaty_realizatsii_initsiativy_uchteny_v_reglamente_soprovozhdeniya",
+          "title_ru": "Результаты реализации инициативы учтены в регламенте сопровождения",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "rezultaty_realizatsii_initsiativy_uchteny_v_pasporte_is_v_vide_sootvetstvuyuschikh_korrektirovok",
+          "title_ru": "Результаты реализации инициативы учтены в паспорте ИС в виде соответствующих корректировок",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "rezultaty_realizatsii_initsiativy_uchteny_v_drp_is_v_kachestve_trebovaniy_k_rezervnomu_kopirovaniyu_vosstanovleniyu",
+          "title_ru": "Результаты реализации инициативы учтены в DRP ИС в качестве требований к резервному копированию / восстановлению",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ikia",
+          "title_ru": "ИКИА",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "pri_vkhodyaschey_integratsii_nabory_iskhodnykh_dannykh",
+          "title_ru": "ПРИ входящей интеграции\n(наборы исходных данных)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "pri_iskhodyaschey_integratsii_nabory_vykhodnykh_dannykh",
+          "title_ru": "ПРИ исходящей интеграции\n(наборы выходных данных)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "pravila_dostupa_v_chasti_matritsy_roley_i_polnomochiy_roli_dlya_tuz_ili_otchetov",
+          "title_ru": "Правила доступа в части матрицы ролей и полномочий (роли для ТУЗ или отчетов)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "model_iskhodnykh_dannykh_nabory_iskhodnykh_dannykh",
+          "title_ru": "Модель исходных данных\n(наборы исходных данных)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "spetsifikatsiya_na_vitrinu_preobrazovaniya_ili_proverki_dannykh",
+          "title_ru": "Спецификация на витрину\n(преобразования или проверки данных)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "spetsifikatsiya_na_potok_preobrazovaniya_ili_proverki_dannykh",
+          "title_ru": "Спецификация на поток \n(преобразования или проверки данных)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "spetsifikatsiya_na_otchet_proverochnye_ili_polzovatelskie_otchety",
+          "title_ru": "Спецификация на отчет\n(проверочные или пользовательские отчеты)",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "aktualnost_resheniya_na_dannyy_moment",
+          "title_ru": "Актуальность решения на данный момент",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "status_resheniya",
+          "title_ru": "Статус решения",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "biznes_aktualnost",
+          "title_ru": "Бизнес-актуальность",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "otvetstvennoe_podrazdelenie_so_storony_bz",
+          "title_ru": "Ответственное подразделение со стороны БЗ",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "predstavitel_bz",
+          "title_ru": "Представитель БЗ",
+          "type": "string",
+          "required": false,
+          "relation_hint": "person_reference"
+        },
+        {
+          "name": "soglasovano_na_migratsiyu_v_ml_platformu_neobkhodimost_migratsii",
+          "title_ru": "Согласовано на миграцию в ML- платформу: необходимость миграции",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "prioritet",
+          "title_ru": "Приоритет",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "sroki_migratsii_na_ml_platformu",
+          "title_ru": "Сроки миграции на ML-платформу",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "kommentarii",
+          "title_ru": "Комментарии",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "tekh_stek",
+          "title_ru": "Тех.стек",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "gpu",
+          "title_ru": "GPU",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "cpu",
+          "title_ru": "CPU",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ram",
+          "title_ru": "RAM",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "storage",
+          "title_ru": "Storage",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "detalnyy_etap",
+          "title_ru": "Детальный этап",
+          "type": "string",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

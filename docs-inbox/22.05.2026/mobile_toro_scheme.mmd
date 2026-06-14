@@ -1,0 +1,37 @@
+graph TD
+    Start[Идея: Создание Мобильного ТОРО] --> Step1{Шаг 1:<br/>Обращение к<br/>Корпоративному Архитектору}
+    
+    Step1 -->|Утверждение| Step2[Шаг 2:<br/>Анализ Деревьев мобильности]
+    
+    Step2 --> Choice{Выбор стратегии}
+    
+    Choice -->|Покупка| PathBuy[Путь Б: Выбор вендора]
+    Choice -->|Разработка| PathBuild[Путь А: Внутренняя разработка]
+    
+    PathBuy --> V1[Обзор рынка и реестра ПО РФ]
+    V1 --> V2[Формирование списка вендоров]
+    V2 --> V3[Оценка зрелости продукта<br/>(как в IT.P. 24-11)]
+    V3 --> V4[Пилотное внедрение]
+    
+    PathBuild --> I1[Формирование ТЗ]
+    I1 --> I2[Выбор стега по стандартам<br/>Деревьев мобильности]
+    I2 --> I3[Создание MVP/Прототипа]
+    I3 --> I4[Тестирование релевантности]
+    
+    V4 --> Validation{Шаг 3:<br/>Валидация решения}
+    I4 --> Validation
+    
+    Validation -->|Успех| Step4[Шаг 4:<br/>Интеграция в архитектуру]
+    Validation -->|Отказ| BackToStart[Возврат к анализу<br/>или отказ от проекта]
+    
+    Step4 --> EndNode[Шаг 5:<br/>Масштабирование]
+
+    classDef startClass fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef step1Class fill:#fff9c4,stroke:#fbc02d,stroke-width:3px;
+    classDef validationClass fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef endClass fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+
+    class Start startClass;
+    class Step1 step1Class;
+    class Validation validationClass;
+    class EndNode endClass;
