@@ -29,6 +29,11 @@ notes/
 schema.json
 *schema*
 
+# Локальные зависимости и сводные Excel (не в Git)
+requirements.txt
+unified_excel_summary.xlsx
+unified_excel_summary_excel.xlsx
+
 # Python
 __pycache__/
 *.py[cod]
